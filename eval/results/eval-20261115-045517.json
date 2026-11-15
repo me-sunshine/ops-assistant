@@ -1,0 +1,190 @@
+{
+  "summary": {
+    "run_at": "2026-11-15T04:55:17+00:00",
+    "model": "qwen2.5:7b",
+    "requests_submitted": 8,
+    "requests_completed": 8,
+    "reliability": 1.0,
+    "seconds_median": 298.2,
+    "seconds_min": 274.7,
+    "seconds_max": 357.8,
+    "stated_fact_recall": 0.774,
+    "facts_found": 24,
+    "facts_expected": 31,
+    "missing_info_recall_ai_only": 0.692,
+    "missing_info_recall_with_system_checks": 0.769,
+    "gaps_expected": 26,
+    "items_proposed": 119,
+    "stated_claims_verified": 23,
+    "stated_claims_downgraded": 12
+  },
+  "per_request": [
+    {
+      "id": "R01",
+      "request_id": 1,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 277.1,
+      "items_proposed": 14,
+      "stated_verified": 4,
+      "stated_downgraded": 0,
+      "facts_expected": 4,
+      "facts_found": 2,
+      "facts_missed": [
+        "invoicing export",
+        "anna keller"
+      ],
+      "gaps_expected": 3,
+      "gaps_found_ai": 3,
+      "gaps_found_with_system_checks": 3,
+      "gaps_missed": []
+    },
+    {
+      "id": "R02",
+      "request_id": 2,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 274.7,
+      "items_proposed": 16,
+      "stated_verified": 3,
+      "stated_downgraded": 3,
+      "facts_expected": 4,
+      "facts_found": 3,
+      "facts_missed": [
+        "jonas brandt"
+      ],
+      "gaps_expected": 3,
+      "gaps_found_ai": 2,
+      "gaps_found_with_system_checks": 2,
+      "gaps_missed": [
+        "tool"
+      ]
+    },
+    {
+      "id": "R03",
+      "request_id": 3,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 357.8,
+      "items_proposed": 18,
+      "stated_verified": 4,
+      "stated_downgraded": 0,
+      "facts_expected": 4,
+      "facts_found": 4,
+      "facts_missed": [],
+      "gaps_expected": 3,
+      "gaps_found_ai": 2,
+      "gaps_found_with_system_checks": 3,
+      "gaps_missed": []
+    },
+    {
+      "id": "R04",
+      "request_id": 4,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 275.4,
+      "items_proposed": 14,
+      "stated_verified": 1,
+      "stated_downgraded": 1,
+      "facts_expected": 2,
+      "facts_found": 2,
+      "facts_missed": [],
+      "gaps_expected": 4,
+      "gaps_found_ai": 2,
+      "gaps_found_with_system_checks": 3,
+      "gaps_missed": [
+        "requirement"
+      ]
+    },
+    {
+      "id": "R05",
+      "request_id": 5,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 299.6,
+      "items_proposed": 12,
+      "stated_verified": 4,
+      "stated_downgraded": 0,
+      "facts_expected": 5,
+      "facts_found": 2,
+      "facts_missed": [
+        "mira hoffmann",
+        "six weeks",
+        "error rate"
+      ],
+      "gaps_expected": 3,
+      "gaps_found_ai": 2,
+      "gaps_found_with_system_checks": 2,
+      "gaps_missed": [
+        "vendor"
+      ]
+    },
+    {
+      "id": "R06",
+      "request_id": 6,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 304.5,
+      "items_proposed": 15,
+      "stated_verified": 2,
+      "stated_downgraded": 3,
+      "facts_expected": 4,
+      "facts_found": 4,
+      "facts_missed": [],
+      "gaps_expected": 4,
+      "gaps_found_ai": 3,
+      "gaps_found_with_system_checks": 3,
+      "gaps_missed": [
+        "tool"
+      ]
+    },
+    {
+      "id": "R07",
+      "request_id": 7,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 334.7,
+      "items_proposed": 17,
+      "stated_verified": 5,
+      "stated_downgraded": 1,
+      "facts_expected": 4,
+      "facts_found": 4,
+      "facts_missed": [],
+      "gaps_expected": 3,
+      "gaps_found_ai": 2,
+      "gaps_found_with_system_checks": 2,
+      "gaps_missed": [
+        "volume"
+      ]
+    },
+    {
+      "id": "R08",
+      "request_id": 8,
+      "ok": true,
+      "status": "needs_review",
+      "error": null,
+      "seconds": 296.9,
+      "items_proposed": 13,
+      "stated_verified": 0,
+      "stated_downgraded": 4,
+      "facts_expected": 4,
+      "facts_found": 3,
+      "facts_missed": [
+        "40 people"
+      ],
+      "gaps_expected": 3,
+      "gaps_found_ai": 2,
+      "gaps_found_with_system_checks": 2,
+      "gaps_missed": [
+        "moving company"
+      ]
+    }
+  ]
+}

@@ -165,3 +165,15 @@ tests/                automated tests
 docs/                 test report and screenshots
 docker-compose.yml    local stack: ollama, n8n, app
 ```
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Intake form](docs/screenshots/01-intake-form.png) Intake form | ![Review screen](docs/screenshots/02-review-pending.png) AI output waiting for review |
+| ![Decisions](docs/screenshots/03-review-decisions.png) Accepted, edited and rejected items | ![Draft update](docs/screenshots/04-stakeholder-draft.png) Stakeholder update, draft only |
+| ![Record](docs/screenshots/05-confirmed-record.png) Confirmed project record | ![Audit log](docs/screenshots/06-audit-log.png) Audit log |
+
+## Measured results
+
+From the evaluation of 15 November 2026 (8 synthetic requests, Qwen2.5 7B on 4 CPU cores): all 8 requests completed, median processing time 298 seconds, 24 of 31 stated facts captured, 20 of 26 known gaps detected. The full report, including the errors the review step caught and what has not been measured, is in [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md).
