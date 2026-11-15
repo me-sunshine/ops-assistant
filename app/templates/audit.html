@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Audit log{% endblock %}{% block body %}
+<h1>Audit log</h1>
+<p class="muted">{% if request_id %}Request #{{ request_id }}. <a href="/audit">Show all</a>.{% else %}Latest 500 entries.{% endif %} Entries cannot be changed or deleted; the database rejects both.</p>
+<div class="tw"><table><thead><tr><th>Time (UTC)</th><th>Actor</th><th>Action</th><th>Request</th><th>Detail</th></tr></thead><tbody>
+{% for a in rows %}<tr><td>{{ a.at[:19]|replace('T',' ') }}</td><td>{{ a.actor }}</td><td>{{ a.action|replace('_',' ') }}</td>
+<td>{% if a.request_id %}<a href="/requests/{{ a.request_id }}">#{{ a.request_id }}</a>{% endif %}</td><td class="small">{{ a.detail or '' }}</td></tr>{% endfor %}
+</tbody></table></div>{% endblock %}

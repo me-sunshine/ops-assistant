@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}New project request{% endblock %}{% block body %}
+<h1>Submit a project request</h1>
+<p class="muted">Only the first four fields and your name are required. Gaps are allowed on purpose: the assistant should point them out.</p>
+{% macro err(k) %}{% if errors.get(k) %}<span class="err" id="err-{{k}}">{{ errors[k] }}</span>{% endif %}{% endmacro %}
+<form class="stack" method="post" action="/requests" novalidate>
+<label for="project_name">Project name<input id="project_name" name="project_name" value="{{ f.project_name }}" maxlength="120">{{ err('project_name') }}</label>
+<label for="department">Business department<input id="department" name="department" value="{{ f.department }}" maxlength="80">{{ err('department') }}</label>
+<label for="description">Request description<span>What is needed and why, in your own words.</span><textarea id="description" name="description">{{ f.description }}</textarea>{{ err('description') }}</label>
+<label for="priority">Priority<select id="priority" name="priority">{% for p in PRIORITIES %}<option {% if f.priority==p %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>{{ err('priority') }}</label>
+<label for="requested_date">Requested completion date<span>Optional. Format YYYY-MM-DD.</span><input id="requested_date" name="requested_date" type="date" value="{{ f.requested_date }}">{{ err('requested_date') }}</label>
+<label for="stakeholders">Stakeholders<span>Optional. Names and roles, separated by commas.</span><input id="stakeholders" name="stakeholders" value="{{ f.stakeholders }}">{{ err('stakeholders') }}</label>
+<label for="business_objective">Business objective<span>Optional. The outcome the business wants.</span><textarea id="business_objective" name="business_objective" style="min-height:70px">{{ f.business_objective }}</textarea>{{ err('business_objective') }}</label>
+<label for="submitted_by">Your name<input id="submitted_by" name="submitted_by" value="{{ f.submitted_by }}" maxlength="80">{{ err('submitted_by') }}</label>
+<div><button class="primary" type="submit">Submit request</button></div>
+</form>{% endblock %}

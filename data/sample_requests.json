@@ -1,0 +1,117 @@
+{
+  "_note": "Synthetic demonstration data. All people, teams and projects are invented. 'expected' is the answer key used by eval/run_eval.py: 'stated_facts' are keyword groups that should appear in at least one extracted item (any keyword in a group counts), 'gaps' are keyword groups that should appear in the missing-information list.",
+  "requests": [
+    {
+      "id": "R01",
+      "project_name": "CRM migration for Sales",
+      "department": "Sales Operations",
+      "description": "We need to move the sales team from the old spreadsheet-based tracking to the new CRM before the end of the quarter. Finance needs the monthly invoicing export to keep working after the switch. Anna Keller from Sales will collect the list of fields we use today. IT has to confirm single sign-on before we can invite users.",
+      "priority": "High",
+      "requested_date": "+135",
+      "stakeholders": "Anna Keller (Sales Lead), Finance team",
+      "business_objective": "",
+      "expected": {
+        "stated_facts": [["invoicing export", "invoice export"], ["single sign-on", "sso"], ["anna keller"], ["fields"]],
+        "gaps": [["budget", "cost"], ["owner", "project manager", "project lead", "responsible"], ["objective", "success criteria", "goal"]]
+      }
+    },
+    {
+      "id": "R02",
+      "project_name": "New starter onboarding checklist",
+      "department": "People & Culture",
+      "description": "Onboarding is different in every team and new starters often wait days for a laptop and accounts. We want one digital checklist that HR, IT and the hiring manager all work from. It should send reminders one week before the start date. Jonas Brandt in IT owns equipment ordering. We would like a pilot with the Customer Support team first.",
+      "priority": "Medium",
+      "requested_date": "",
+      "stakeholders": "Jonas Brandt (IT), Customer Support team lead",
+      "business_objective": "Every new starter has equipment and accounts on day one.",
+      "expected": {
+        "stated_facts": [["reminder"], ["jonas brandt"], ["pilot", "customer support"], ["checklist"]],
+        "gaps": [["deadline", "date", "timeline"], ["budget", "cost"], ["tool", "system", "platform", "software"]]
+      }
+    },
+    {
+      "id": "R03",
+      "project_name": "Quarterly board report automation",
+      "department": "Finance",
+      "description": "Preparing the quarterly board report takes the controlling team about two weeks of copying numbers from the ERP into slides. We want the figures pulled automatically and a draft ready for review. The CFO must sign off the final version. Data comes from the ERP and from the HR headcount file, which is maintained manually.",
+      "priority": "High",
+      "requested_date": "+60",
+      "stakeholders": "",
+      "business_objective": "Reduce the time needed to prepare the board report.",
+      "expected": {
+        "stated_facts": [["erp"], ["headcount"], ["cfo", "sign off", "sign-off"], ["draft"]],
+        "gaps": [["stakeholder", "contact", "who"], ["budget", "cost"], ["owner", "project manager", "project lead", "responsible"]]
+      }
+    },
+    {
+      "id": "R04",
+      "project_name": "Website cookie banner update",
+      "department": "Marketing",
+      "description": "Legal told us the cookie banner on the website needs to be updated. Please fix it as soon as possible.",
+      "priority": "Critical",
+      "requested_date": "+5",
+      "stakeholders": "",
+      "business_objective": "",
+      "expected": {
+        "stated_facts": [["cookie banner"], ["legal"]],
+        "gaps": [["requirement", "what needs", "change", "scope", "detail"], ["stakeholder", "contact", "who"], ["owner", "responsible", "project manager", "project lead"], ["objective", "goal", "success"]]
+      }
+    },
+    {
+      "id": "R05",
+      "project_name": "Warehouse barcode scanning pilot",
+      "department": "Logistics",
+      "description": "We want to trial handheld barcode scanners in the Leipzig warehouse to cut picking errors. Mira Hoffmann (Warehouse Manager) will select ten pickers for the pilot. The scanners must work with the existing inventory system. Procurement has to approve the purchase of the devices first. The pilot should run for six weeks and we will compare error rates before and after.",
+      "priority": "Medium",
+      "requested_date": "+120",
+      "stakeholders": "Mira Hoffmann (Warehouse Manager), Procurement, IT Infrastructure",
+      "business_objective": "Reduce picking errors in the Leipzig warehouse.",
+      "expected": {
+        "stated_facts": [["mira hoffmann"], ["inventory system"], ["procurement"], ["six weeks", "6 weeks"], ["error rate"]],
+        "gaps": [["budget", "cost"], ["vendor", "supplier", "model", "which scanner", "device"], ["target", "success criteria", "threshold"]]
+      }
+    },
+    {
+      "id": "R06",
+      "project_name": "Customer support knowledge base",
+      "department": "Customer Support",
+      "description": "Agents answer the same questions again and again and the answers live in old emails. We need a searchable knowledge base. Start with the 50 most common questions. Articles need to be approved by a team lead before they are published. Elif Demir will coordinate the writing.",
+      "priority": "Low",
+      "requested_date": "",
+      "stakeholders": "Elif Demir (Support Team Lead)",
+      "business_objective": "",
+      "expected": {
+        "stated_facts": [["50 most common", "50 questions", "50 most"], ["approved", "approval"], ["elif demir"], ["searchable"]],
+        "gaps": [["deadline", "date", "timeline"], ["budget", "cost"], ["tool", "platform", "system", "software"], ["objective", "goal", "success"]]
+      }
+    },
+    {
+      "id": "R07",
+      "project_name": "Supplier invoice approval workflow",
+      "department": "Procurement",
+      "description": "Supplier invoices are approved by email today and some are paid late. We want a workflow where invoices above 5,000 EUR need two approvals and everything else needs one. The workflow has to connect to the accounting system. Internal Audit wants a record of who approved what. Go-live should be before the financial year end.",
+      "priority": "High",
+      "requested_date": "+200",
+      "stakeholders": "Head of Procurement, Internal Audit, Accounting",
+      "business_objective": "Pay suppliers on time and keep an approval record for audit.",
+      "expected": {
+        "stated_facts": [["5,000", "5000"], ["two approvals", "two approvers", "2 approvals"], ["accounting system"], ["audit", "record of who"]],
+        "gaps": [["owner", "project manager", "project lead", "responsible"], ["budget", "cost"], ["volume", "how many", "number of invoices"]]
+      }
+    },
+    {
+      "id": "R08",
+      "project_name": "Office move to new floor",
+      "department": "Facilities",
+      "description": "The product team of 40 people moves from the 2nd to the 5th floor. Desks and monitors need to be moved over a weekend so nobody loses a working day. The network ports on the 5th floor have not been tested yet. Building management needs two weeks' notice for the goods lift.",
+      "priority": "Medium",
+      "requested_date": "+45",
+      "stakeholders": "Product team lead, Building management, IT Support",
+      "business_objective": "Move the product team without losing a working day.",
+      "expected": {
+        "stated_facts": [["40 people", "40"], ["weekend"], ["network ports"], ["two weeks", "goods lift"]],
+        "gaps": [["budget", "cost"], ["owner", "project manager", "project lead", "responsible"], ["moving company", "who will move", "movers", "contractor"]]
+      }
+    }
+  ]
+}

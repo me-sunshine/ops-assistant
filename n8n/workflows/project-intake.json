@@ -1,0 +1,359 @@
+{
+  "name": "Project intake: extract, summarise, draft update",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "project-intake",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "webhook",
+      "name": "Webhook",
+      "webhookId": "project-intake"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: the webhook body sent by the review app.\nconst b = $input.first().json.body;\nconst r = b.request;\nconst requestText = [\n  `Project name: ${r.project_name}`,\n  `Business department: ${r.department}`,\n  `Priority: ${r.priority}`,\n  `Requested completion date: ${r.requested_date || '(not supplied)'}`,\n  `Stakeholders: ${r.stakeholders || '(not supplied)'}`,\n  `Business objective: ${r.business_objective || '(not supplied)'}`,\n  `Request description: ${r.description}`,\n].join('\\n');\n\nconst item = {\n  type: 'object',\n  properties: {\n    text: { type: 'string' },\n    source: { type: 'string', enum: ['stated', 'suggested'] },\n    evidence: { type: 'string' },\n  },\n  required: ['text', 'source', 'evidence'],\n};\nconst task = {\n  type: 'object',\n  properties: {\n    ...item.properties,\n    suggested_owner: { type: ['string', 'null'] },\n    due_date: { type: ['string', 'null'] },\n  },\n  required: ['text', 'source', 'evidence', 'suggested_owner', 'due_date'],\n};\nconst list = (of) => ({ type: 'array', items: of, maxItems: 6 });\nconst schema = {\n  type: 'object',\n  properties: {\n    objective: item,\n    requirements: list(item),\n    tasks: list(task),\n    dependencies: list(item),\n    risks: list(item),\n    missing_information: list(item),\n  },\n  required: ['objective', 'requirements', 'tasks', 'dependencies', 'risks', 'missing_information'],\n};\n\nconst system = `You are a project coordination assistant. You read ONE project request and return JSON only.\nToday's date is ${b.today}.\n\nRules:\n1. Every item has a \"source\". Use \"stated\" ONLY when the request explicitly says it. Then \"evidence\" must be a short exact quote copied word for word from the request (at most 20 words).\n2. Use \"suggested\" when you infer or propose something yourself. Then \"evidence\" must be an empty string.\n3. Never invent names, dates, budgets or numbers.\n4. tasks: concrete actions needed to deliver the request. When the request says a named person or team will do something, that is a \"stated\" task: quote it and put that person or team in \"suggested_owner\". \"suggested_owner\" may only be a person, role or department that appears in the request, otherwise null. \"due_date\" only when the request gives a date for that task, written YYYY-MM-DD, otherwise null.\n5. dependencies: things this project relies on (other teams, systems, approvals, data).\n6. risks: realistic risks for this specific request.\n7. missing_information: information a project manager needs that the request does NOT provide (for example project owner, budget, scope boundaries, success criteria, deadline, stakeholders, approvals). List only what is really absent. If a field says \"(not supplied)\", it is missing.\n8. At most 6 items per list. One sentence per item. Return empty lists when there is nothing to report.`;\n\nreturn [{\n  json: {\n    ctx: b,\n    requestText,\n    ollamaBody: {\n      model: b.model,\n      stream: false,\n      format: schema,\n      options: { temperature: 0, num_ctx: 8192, num_predict: 1400 },\n      messages: [\n        { role: 'system', content: system },\n        { role: 'user', content: requestText },\n      ],\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "build-extraction-request",
+      "name": "Build extraction request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Build extraction request').first().json.ctx.ollama_url }}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.ollamaBody) }}",
+        "options": {
+          "timeout": 1500000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "ollama-extract",
+      "name": "Ollama: extract",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the extraction and prepare the summary call.\nconst first = $('Build extraction request').first().json;\nconst extraction = JSON.parse($input.first().json.message.content);\n\nconst strings = { type: 'array', items: { type: 'string' }, maxItems: 6 };\nconst schema = {\n  type: 'object',\n  properties: {\n    executive_summary: { type: 'string' },\n    objectives: strings,\n    key_milestones: strings,\n    outstanding_actions: strings,\n    potential_blockers: strings,\n    stakeholder_responsibilities: strings,\n  },\n  required: ['executive_summary', 'objectives', 'key_milestones', 'outstanding_actions', 'potential_blockers', 'stakeholder_responsibilities'],\n};\n\nconst system = `You write a structured project summary for a project manager. Return JSON only.\nToday's date is ${first.ctx.today}.\n\nRules:\n1. Use only the project request and the extracted items you are given.\n2. Anything that is not stated in the request must start with \"(Suggested)\".\n3. Never invent names, dates, budgets or numbers. If no date is given, do not create one.\n4. executive_summary: 2 to 3 sentences.\n5. key_milestones: only milestones that follow from the request. Include a date only when the request gives it. If a requested completion date is supplied, include it as the final milestone.\n6. stakeholder_responsibilities: only for stakeholders named in the request. If none are named, return one item saying that stakeholders are not yet identified.\n7. At most 6 items per list. One sentence per item.`;\n\nconst user = `PROJECT REQUEST\\n${first.requestText}\\n\\nEXTRACTED ITEMS (JSON)\\n${JSON.stringify(extraction)}`;\n\nreturn [{\n  json: {\n    extraction,\n    ollamaBody: {\n      model: first.ctx.model,\n      stream: false,\n      format: schema,\n      options: { temperature: 0, num_ctx: 8192, num_predict: 900 },\n      messages: [\n        { role: 'system', content: system },\n        { role: 'user', content: user },\n      ],\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "build-summary-request",
+      "name": "Build summary request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Build extraction request').first().json.ctx.ollama_url }}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.ollamaBody) }}",
+        "options": {
+          "timeout": 1500000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "ollama-summarise",
+      "name": "Ollama: summarise",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the summary and prepare the stakeholder update call.\nconst first = $('Build extraction request').first().json;\nconst extraction = $('Build summary request').first().json.extraction;\nconst summary = JSON.parse($input.first().json.message.content);\n\nconst strings = { type: 'array', items: { type: 'string' }, maxItems: 6 };\nconst schema = {\n  type: 'object',\n  properties: {\n    subject: { type: 'string' },\n    progress: { type: 'string' },\n    completed_activities: strings,\n    outstanding_tasks: strings,\n    upcoming_milestones: strings,\n    risks_and_decisions: strings,\n  },\n  required: ['subject', 'progress', 'completed_activities', 'outstanding_tasks', 'upcoming_milestones', 'risks_and_decisions'],\n};\n\nconst system = `You draft a status update for the stakeholders of a project. A human will review and edit it before anything is sent. Return JSON only.\nToday's date is ${first.ctx.today}.\n\nRules:\n1. The project has only just been requested. Work has not started unless the request says otherwise.\n2. Use only facts from the request and the extracted items. Never invent progress, names, dates or numbers.\n3. completed_activities: only activities the request says are already done. Otherwise return an empty list.\n4. progress: 1 to 2 sentences on where the project stands today.\n5. risks_and_decisions: the main risks, and the decisions or missing information the stakeholders must provide.\n6. Plain, professional tone. At most 6 items per list. One sentence per item.`;\n\nconst user = `PROJECT REQUEST\\n${first.requestText}\\n\\nEXTRACTED ITEMS (JSON)\\n${JSON.stringify(extraction)}`;\n\nreturn [{\n  json: {\n    summary,\n    ollamaBody: {\n      model: first.ctx.model,\n      stream: false,\n      format: schema,\n      options: { temperature: 0, num_ctx: 8192, num_predict: 900 },\n      messages: [\n        { role: 'system', content: system },\n        { role: 'user', content: user },\n      ],\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "build-update-request",
+      "name": "Build update request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Build extraction request').first().json.ctx.ollama_url }}/api/chat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.ollamaBody) }}",
+        "options": {
+          "timeout": 1500000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "ollama-draft-update",
+      "name": "Ollama: draft update",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all three AI outputs into one result for the review app.\nconst ctx = $('Build extraction request').first().json.ctx;\nconst extraction = $('Build summary request').first().json.extraction;\nconst summary = $('Build update request').first().json.summary;\nconst update = JSON.parse($input.first().json.message.content);\nreturn [{ json: { request_id: ctx.request_id, result: { extraction, summary, update } } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        0
+      ],
+      "id": "assemble-result",
+      "name": "Assemble result",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.callback_url }}/api/ai-result",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Callback-Token",
+              "value": "={{ $('Webhook').first().json.body.callback_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        0
+      ],
+      "id": "send-result-for-human-review",
+      "name": "Send result for human review"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.callback_url }}/api/ai-error",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Callback-Token",
+              "value": "={{ $('Webhook').first().json.body.callback_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ request_id: $('Webhook').first().json.body.request_id, error: String($json.error?.message || $json.error || 'unknown error').slice(0, 300) }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        260
+      ],
+      "id": "report-failure",
+      "name": "Report failure"
+    },
+    {
+      "parameters": {
+        "content": "## Human oversight\nThis workflow only *proposes*. It hands its output to the review app, where every item waits for a person. It has no email or messaging nodes, so it cannot contact stakeholders.",
+        "height": 180,
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        -240
+      ],
+      "id": "note",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build extraction request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build extraction request": {
+      "main": [
+        [
+          {
+            "node": "Ollama: extract",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama: extract": {
+      "main": [
+        [
+          {
+            "node": "Build summary request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build summary request": {
+      "main": [
+        [
+          {
+            "node": "Ollama: summarise",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama: summarise": {
+      "main": [
+        [
+          {
+            "node": "Build update request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build update request": {
+      "main": [
+        [
+          {
+            "node": "Ollama: draft update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama: draft update": {
+      "main": [
+        [
+          {
+            "node": "Assemble result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble result": {
+      "main": [
+        [
+          {
+            "node": "Send result for human review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "id": "projectIntake01",
+  "pinData": {}
+}

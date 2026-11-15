@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Operations Assistant{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">{% block head %}{% endblock %}</head>
+<body>
+<div class="banner">Demonstration prototype. All project data is synthetic. Nothing is ever sent to stakeholders.</div>
+<header class="top"><div class="wrap"><b>Operations Assistant</b>
+<nav><a href="/">Requests</a><a href="/new">New request</a><a href="/audit">Audit log</a></nav></div></header>
+<main class="wrap">{% block body %}{% endblock %}</main>
+</body></html>

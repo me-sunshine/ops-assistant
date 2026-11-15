@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block title %}Record: {{ r.project_name }}{% endblock %}{% block body %}
+<h1>Confirmed project record</h1>
+<p class="muted">{{ r.project_name }} · request #{{ r.id }}. This page shows only what a person accepted. Pending and rejected AI output is excluded.</p>
+<p class="small muted">Accepted {{ counts.get('accepted',0) }} · Accepted with edits {{ counts.get('edited',0) }} · Rejected {{ counts.get('rejected',0) }} · Still pending {{ counts.get('pending',0) }} · <a href="/requests/{{ r.id }}">Back to review</a></p>
+{% set any = namespace(v=false) %}
+{% for kind in ITEM_KINDS %}{% if grouped[kind] %}{% set any.v = true %}
+<h2>{{ KIND_LABELS[kind] }}</h2>
+<div class="tw"><table><thead><tr><th>Item</th>{% if kind=='task' %}<th>Owner</th><th>Due</th>{% endif %}<th>Origin</th><th>Confirmed by</th></tr></thead><tbody>
+{% for i in grouped[kind] %}<tr><td>{{ i.text }}</td>{% if kind=='task' %}<td>{{ i.owner or 'unassigned' }}</td><td>{{ i.due_date or 'not set' }}</td>{% endif %}
+<td><span class="chip {{ i.provenance }}">{{ i.provenance|replace('_',' ') }}</span></td><td>{{ i.reviewed_by }}{% if i.status=='edited' %} (edited){% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% endif %}{% endfor %}
+{% for d in docs %}{% set any.v = true %}<h2>{{ 'Project summary' if d.kind == 'summary' else 'Stakeholder update (approved, not sent)' }}</h2><div class="box"><pre>{{ d.content }}</pre></div>{% endfor %}
+{% if not any.v %}<p class="box">Nothing has been confirmed yet.</p>{% endif %}
+{% endblock %}

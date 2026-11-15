@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block body %}
+<h1>Project requests</h1>
+<p class="muted">Each request is read by a local AI model. Its output waits here until a person reviews it.</p>
+<p><a class="btn primary" href="/new">Submit a project request</a></p>
+{% if rows %}<div class="tw"><table><thead><tr><th>#</th><th>Project</th><th>Department</th><th>Priority</th><th>Status</th><th>Awaiting review</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.id }}</td><td><a href="/requests/{{ r.id }}">{{ r.project_name }}</a></td><td>{{ r.department }}</td><td>{{ r.priority }}</td>
+<td><span class="chip {{ r.status }}">{{ r.status|replace('_',' ') }}</span></td><td>{{ r.pending }}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="box">No requests yet. Submit one to see the workflow.</p>{% endif %}
+{% endblock %}
