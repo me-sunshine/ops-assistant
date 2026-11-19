@@ -4,6 +4,14 @@ AI-assisted project coordination and stakeholder management, with a human approv
 
 > **Independent portfolio project.** This is a demonstration prototype built by Rashmi Singh. It is not a commercial implementation and was not built for a client. All project data in it is synthetic.
 
+## See it working
+
+[![Watch a 48-second walkthrough of the prototype](docs/prototype-walkthrough-poster.jpg)](docs/prototype-walkthrough.mp4)
+
+[Watch the walkthrough](docs/prototype-walkthrough.mp4) (48 seconds, no sound): a reviewer edits an AI-suggested task owner, rejects a wrong AI flag, and the result appears in the confirmed record and the audit log. It uses the synthetic test data. The full case study is on the [portfolio website](https://rashmi-singh.rashmissingh97.workers.dev/ai-lab/intelligent-business-operations-assistant/).
+
+There is no public live demo: the prototype runs an AI model on your own machine and must not be exposed to the internet. Follow the setup below to run it yourself.
+
 ## What it does
 
 1. A user submits a project request through a form.
