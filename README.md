@@ -139,7 +139,28 @@ This is the setup the prototype was tested with.
 
 Set `OLLAMA_MODEL` in a `.env` file (copy `.env.example`). Any Ollama model that supports structured output works. Smaller models are faster and less accurate. Check the model's licence on its Ollama library page before using it.
 
-## Tests
+## Troubleshooting
+
+**http://localhost:8000 says "This site can't be reached" or "connection refused".**
+Nothing is answering on port 8000. `localhost` means your own computer, so the prototype only opens while it is running there.
+
+- With Docker: open Docker Desktop and wait until it says it is running, then run `docker compose ps` in the project folder. The `app` line must say `Up`. If it is missing or says `Exited`, run `docker compose logs app` to see why.
+- Without Docker: the terminal running `python -m uvicorn app.main:app ...` must stay open. Closing it stops the prototype.
+- Try http://127.0.0.1:8000 instead. On some computers `localhost` points to a different network address than the one the app listens on.
+
+**`ModuleNotFoundError: No module named 'app'`.**
+You started uvicorn from inside the `app` folder. Go up one level to the project folder (where `docker-compose.yml` is) and start it from there.
+
+**`TypeError: unsupported operand type(s) for |` when starting.**
+Your Python is older than 3.10. Install Python 3.11 or newer.
+
+**"Address already in use" or "port is already allocated".**
+Another program is using port 8000. Stop it, or start the prototype on another port: `--port 8001` without Docker, or change `127.0.0.1:8000:8000` to `127.0.0.1:8001:8000` in `docker-compose.yml`. Then open http://localhost:8001.
+
+**The page opens, but every request ends as "failed".**
+The AI side is not ready. Run `docker compose logs ollama-pull`: the model download (about 4.7 GB) must finish with `success`. Without Docker, check that `ollama list` shows `qwen2.5:7b` and that n8n is running with the workflow published.
+
+
 
 ```bash
 pip install pytest && python -m pytest tests

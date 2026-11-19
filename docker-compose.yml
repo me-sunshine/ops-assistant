@@ -7,11 +7,18 @@ services:
       - ollama_models:/root/.ollama
     # No ports published: only n8n can reach the model, over the internal network.
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
 
   ollama-pull:
     # One-off job: downloads the model on first start (about 4.7 GB for qwen2.5:7b).
     image: ollama/ollama:latest
-    depends_on: [ollama]
+    depends_on:
+      ollama:
+        condition: service_healthy   # wait until the model server answers, or the download fails at once
     environment:
       OLLAMA_HOST: http://ollama:11434
     entrypoint: ["ollama", "pull", "${OLLAMA_MODEL:-qwen2.5:7b}"]
