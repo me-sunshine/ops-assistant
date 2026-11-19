@@ -105,7 +105,7 @@ This is the setup the prototype was tested with.
    ollama pull qwen2.5:7b
    ```
 
-2. Install n8n (needs Node.js 22.22 or newer: download the LTS installer from https://nodejs.org, then close and reopen your terminal), import the workflow and start it:
+2. Install n8n. It needs **Node.js 24** (version 22.22 or later 22.x also works). Do not use Node.js 26 or newer: one of n8n's parts has no ready-made build for it, and the install fails unless you have C++ build tools. Get Node.js 24 from https://nodejs.org/dist/latest-v24.x/ (on Windows, the file ending `-x64.msi`), then close and reopen your terminal. Import the workflow and start n8n:
 
    ```bash
    npm install -g n8n@2.35.7
@@ -149,10 +149,13 @@ Nothing is answering on port 8000. `localhost` means your own computer, so the p
 - Try http://127.0.0.1:8000 instead. On some computers `localhost` points to a different network address than the one the app listens on.
 
 **`npm : The term 'npm' is not recognized` (Windows) or `npm: command not found` (Mac).**
-Node.js is not installed, or the terminal was opened before it was installed. Install the LTS version from https://nodejs.org, close every terminal window, open a new one and check with `node --version`. n8n needs 22.22 or newer.
+Node.js is not installed, or the terminal was opened before it was installed. Install Node.js 24 from https://nodejs.org/dist/latest-v24.x/, close every terminal window, open a new one and check with `node --version`. It must start with v24 (or v22.22 or later).
 
 **`npm.ps1 cannot be loaded because running scripts is disabled on this system` (Windows).**
 Windows PowerShell blocks the npm script. Either type `npm.cmd` in place of `npm`, or allow signed scripts for your own account once with `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
+**`Error: Cannot find module '...\\node_modules\\n8n\\bin\\n8n'` after installing n8n.**
+The n8n install stopped partway, almost always because Node.js is version 26 or newer. Check with `node --version`. Uninstall that Node.js, install Node.js 24 as above, open a new terminal, then run `npm uninstall -g n8n` followed by `npm install -g n8n@2.35.7`. The install has worked when it ends without lines starting `npm error` and `n8n --version` prints `2.35.7`.
 
 **`ModuleNotFoundError: No module named 'app'`.**
 You started uvicorn from inside the `app` folder. Go up one level to the project folder (where `docker-compose.yml` is) and start it from there.
