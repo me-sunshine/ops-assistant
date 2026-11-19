@@ -105,7 +105,7 @@ This is the setup the prototype was tested with.
    ollama pull qwen2.5:7b
    ```
 
-2. Install n8n (needs Node.js 20 or newer), import the workflow and start it:
+2. Install n8n (needs Node.js 22.22 or newer: download the LTS installer from https://nodejs.org, then close and reopen your terminal), import the workflow and start it:
 
    ```bash
    npm install -g n8n@2.35.7
@@ -147,6 +147,12 @@ Nothing is answering on port 8000. `localhost` means your own computer, so the p
 - With Docker: open Docker Desktop and wait until it says it is running, then run `docker compose ps` in the project folder. The `app` line must say `Up`. If it is missing or says `Exited`, run `docker compose logs app` to see why.
 - Without Docker: the terminal running `python -m uvicorn app.main:app ...` must stay open. Closing it stops the prototype.
 - Try http://127.0.0.1:8000 instead. On some computers `localhost` points to a different network address than the one the app listens on.
+
+**`npm : The term 'npm' is not recognized` (Windows) or `npm: command not found` (Mac).**
+Node.js is not installed, or the terminal was opened before it was installed. Install the LTS version from https://nodejs.org, close every terminal window, open a new one and check with `node --version`. n8n needs 22.22 or newer.
+
+**`npm.ps1 cannot be loaded because running scripts is disabled on this system` (Windows).**
+Windows PowerShell blocks the npm script. Either type `npm.cmd` in place of `npm`, or allow signed scripts for your own account once with `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
 **`ModuleNotFoundError: No module named 'app'`.**
 You started uvicorn from inside the `app` folder. Go up one level to the project folder (where `docker-compose.yml` is) and start it from there.
